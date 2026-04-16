@@ -1,4 +1,4 @@
-import { UserMenu } from "@/components/user-menu";
+import { Zap } from "lucide-react";
 import { sidebarItems } from "./constants";
 import { SidebarNav } from "./sidebar-nav";
 
@@ -11,14 +11,14 @@ export function Sidebar({ isOpen }: SidebarProps) {
     <aside
       className={`${
         isOpen ? "w-64" : "w-0"
-      } transition-all duration-300 ease-in-out bg-muted/50 border-r overflow-hidden`}
+      } transition-all duration-300 ease-in-out bg-slate-800 overflow-hidden flex-shrink-0`}
     >
       <div className="h-full flex flex-col">
-        <div className="h-14 flex items-center px-4 border-b">
-          <h2 className="font-semibold text-lg">Console</h2>
+        <div className="h-14 flex items-center px-4 gap-2">
+          <Zap className="h-5 w-5 text-amber-400" />
+          <h2 className="font-semibold text-lg text-white">Volt Dashboard</h2>
         </div>
         <SidebarNav items={sidebarItems} />
-        <UserMenu />
       </div>
     </aside>
   );

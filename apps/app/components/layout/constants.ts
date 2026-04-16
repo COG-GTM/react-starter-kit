@@ -1,9 +1,9 @@
-import { Activity, FileText, Home, Settings, Users } from "lucide-react";
+import { ChartBar, Cog, CreditCard, Home, Table } from "lucide-react";
 
 export const sidebarItems = [
   { icon: Home, label: "Dashboard", to: "/" },
-  { icon: Activity, label: "Analytics", to: "/analytics" },
-  { icon: Users, label: "Users", to: "/users" },
-  { icon: FileText, label: "Reports", to: "/reports" },
-  { icon: Settings, label: "Settings", to: "/settings" },
+  { icon: CreditCard, label: "Transactions", to: "/transactions" },
+  { icon: Cog, label: "Settings", to: "/settings" },
+  { icon: Table, label: "Tables", to: "/tables" },
+  { icon: ChartBar, label: "Analytics", to: "/analytics" },
 ] as const;

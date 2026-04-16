@@ -1,5 +1,5 @@
-import { Button } from "@repo/ui";
-import { Menu, Settings, X } from "lucide-react";
+import { Avatar, AvatarFallback, Button, Input } from "@repo/ui";
+import { Bell, Menu, Search, X } from "lucide-react";
 
 interface HeaderProps {
   isSidebarOpen: boolean;
@@ -23,13 +23,25 @@ export function Header({ isSidebarOpen, onMenuToggle }: HeaderProps) {
       </Button>
 
       <div className="flex-1 flex items-center gap-4">
-        <h1 className="text-lg font-semibold">Application</h1>
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input type="text" placeholder="Search" className="pl-9 h-9 w-64" />
+        </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon">
-          <Settings className="h-5 w-5" />
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-5 w-5" />
+          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500" />
         </Button>
+        <div className="flex items-center gap-2">
+          <Avatar className="h-8 w-8">
+            <AvatarFallback className="text-xs bg-slate-200">BG</AvatarFallback>
+          </Avatar>
+          <span className="text-sm font-medium hidden md:inline">
+            Bonnie Green
+          </span>
+        </div>
       </div>
     </header>
   );
