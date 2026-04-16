@@ -2,7 +2,7 @@ import { signOut, useSessionQuery } from "@/lib/queries/session";
 import { Avatar, AvatarFallback, Button, Skeleton } from "@repo/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { LogOut, RefreshCw, User } from "lucide-react";
+import { LogIn, LogOut, RefreshCw, User } from "lucide-react";
 
 export function UserMenu() {
   const queryClient = useQueryClient();
@@ -48,7 +48,7 @@ export function UserMenu() {
           to="/login"
           className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600"
         >
-          <LogOut className="h-4 w-4" />
+          <LogIn className="h-4 w-4" />
           Sign in
         </Link>
       </div>
