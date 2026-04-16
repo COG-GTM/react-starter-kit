@@ -1,12 +1,11 @@
 import {
-  AcquisitionCard,
-  PageVisitsTable,
-  ProgressTrack,
-  RankingsCard,
-  SalesValueCard,
+  Footer,
+  LatestCustomers,
+  SalesChart,
+  SessionsCountry,
+  SessionsDevice,
   StatCards,
-  TeamMembers,
-  TotalOrdersCard,
+  TransactionsTable,
 } from "@/components/dashboard";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -17,25 +16,21 @@ export const Route = createFileRoute("/(app)/")({
 function Dashboard() {
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-full">
-      <SalesValueCard />
+      <SalesChart />
       <StatCards />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <PageVisitsTable />
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div className="lg:col-span-3">
+          <SessionsCountry />
         </div>
-        <TotalOrdersCard />
+        <div className="lg:col-span-2 space-y-6">
+          <LatestCustomers />
+          <SessionsDevice />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TeamMembers />
-        <ProgressTrack />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RankingsCard />
-        <AcquisitionCard />
-      </div>
+      <TransactionsTable />
+      <Footer />
     </div>
   );
 }

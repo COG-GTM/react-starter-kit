@@ -1,8 +1,7 @@
-export { AcquisitionCard } from "./acquisition-card";
-export { PageVisitsTable } from "./page-visits-table";
-export { ProgressTrack } from "./progress-track";
-export { RankingsCard } from "./rankings-card";
-export { SalesValueCard } from "./sales-value-card";
+export { Footer } from "./footer";
+export { LatestCustomers } from "./latest-customers";
+export { SalesChart } from "./sales-value-card";
+export { SessionsCountry } from "./sessions-country";
+export { SessionsDevice } from "./sessions-device";
 export { StatCards } from "./stat-cards";
-export { TeamMembers } from "./team-members";
-export { TotalOrdersCard } from "./total-orders-card";
+export { TransactionsTable } from "./transactions-table";
