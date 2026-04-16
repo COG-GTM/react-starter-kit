@@ -1,5 +1,6 @@
+import { useSessionQuery } from "@/lib/queries/session";
 import { Avatar, AvatarFallback, Button, Input } from "@repo/ui";
-import { Bell, Menu, Search, X } from "lucide-react";
+import { Bell, Menu, Search, User, X } from "lucide-react";
 
 interface HeaderProps {
   isSidebarOpen: boolean;
@@ -7,6 +8,14 @@ interface HeaderProps {
 }
 
 export function Header({ isSidebarOpen, onMenuToggle }: HeaderProps) {
+  const { data: session } = useSessionQuery();
+  const user = session?.user;
+  const initials = user?.name
+    ?.split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+
   return (
     <header className="h-14 border-b bg-background flex items-center px-4 gap-4">
       <Button
@@ -36,10 +45,12 @@ export function Header({ isSidebarOpen, onMenuToggle }: HeaderProps) {
         </Button>
         <div className="flex items-center gap-2">
           <Avatar className="h-8 w-8">
-            <AvatarFallback className="text-xs bg-slate-200">BG</AvatarFallback>
+            <AvatarFallback className="text-xs bg-slate-200">
+              {initials || <User className="h-4 w-4" />}
+            </AvatarFallback>
           </Avatar>
           <span className="text-sm font-medium hidden md:inline">
-            Bonnie Green
+            {user?.name || "User"}
           </span>
         </div>
       </div>

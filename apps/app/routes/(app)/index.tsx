@@ -17,13 +17,9 @@ export const Route = createFileRoute("/(app)/")({
 function Dashboard() {
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-full">
-      {/* Sales Value Chart */}
       <SalesValueCard />
-
-      {/* Stat Cards Row */}
       <StatCards />
 
-      {/* Page Visits Table + Total Orders */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <PageVisitsTable />
@@ -31,13 +27,11 @@ function Dashboard() {
         <TotalOrdersCard />
       </div>
 
-      {/* Team Members + Progress Track */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TeamMembers />
         <ProgressTrack />
       </div>
 
-      {/* Rankings + Acquisition */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <RankingsCard />
         <AcquisitionCard />
