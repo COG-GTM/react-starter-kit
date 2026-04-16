@@ -1,3 +1,4 @@
+import { UserMenu } from "@/components/user-menu";
 import { Zap } from "lucide-react";
 import { sidebarItems } from "./constants";
 import { SidebarNav } from "./sidebar-nav";
@@ -19,6 +20,7 @@ export function Sidebar({ isOpen }: SidebarProps) {
           <h2 className="font-semibold text-lg text-white">Volt Dashboard</h2>
         </div>
         <SidebarNav items={sidebarItems} />
+        <UserMenu />
       </div>
     </aside>
   );

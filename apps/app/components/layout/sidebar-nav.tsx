@@ -1,10 +1,11 @@
+import type { FileRoutesByTo } from "@/lib/routeTree.gen";
 import { Link } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 
 interface SidebarNavItem {
   icon: LucideIcon;
   label: string;
-  to: string;
+  to: keyof FileRoutesByTo;
 }
 
 interface SidebarNavProps {
