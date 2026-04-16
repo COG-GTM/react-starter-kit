@@ -11,9 +11,9 @@ export function UserMenu() {
   if (isPending) {
     return (
       <div className="flex items-center gap-2 px-3 py-2">
-        <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
+        <div className="h-8 w-8 rounded-full bg-slate-600 animate-pulse" />
         <div className="flex-1">
-          <div className="h-4 w-20 bg-muted rounded animate-pulse" />
+          <div className="h-4 w-20 bg-slate-600 rounded animate-pulse" />
         </div>
       </div>
     );
@@ -21,13 +21,13 @@ export function UserMenu() {
 
   if (error) {
     return (
-      <div className="px-3 py-2 text-sm text-destructive">
+      <div className="px-3 py-2 text-sm text-red-400">
         Failed to load session
         <Button
           variant="ghost"
           size="sm"
           onClick={() => refetch()}
-          className="ml-2"
+          className="ml-2 text-slate-300 hover:text-white hover:bg-slate-700"
         >
           <RefreshCw className="h-3 w-3" />
           Retry
@@ -43,22 +43,25 @@ export function UserMenu() {
   }
 
   return (
-    <div className="p-4 border-t">
+    <div className="p-4 border-t border-slate-700">
       <div className="flex items-center gap-3 px-3 py-2">
         <Avatar className="h-8 w-8">
-          <AvatarFallback>
+          <AvatarFallback className="bg-slate-600 text-white">
             {user.name?.[0]?.toUpperCase() || <User className="h-4 w-4" />}
           </AvatarFallback>
         </Avatar>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium truncate">{user.name || "User"}</p>
-          <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+          <p className="text-sm font-medium text-white truncate">
+            {user.name || "User"}
+          </p>
+          <p className="text-xs text-slate-400 truncate">{user.email}</p>
         </div>
         <Button
           variant="ghost"
           size="icon"
           onClick={() => signOut(queryClient)}
           title="Sign out"
+          className="text-slate-300 hover:text-white hover:bg-slate-700"
         >
           <LogOut className="h-4 w-4" />
         </Button>
