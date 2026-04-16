@@ -1,12 +1,12 @@
 import { signOut, useSessionQuery } from "@/lib/queries/session";
-import { Avatar, AvatarFallback, Skeleton } from "@repo/ui";
+import { Avatar, AvatarFallback, Button, Skeleton } from "@repo/ui";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { LogOut, User } from "lucide-react";
+import { LogOut, RefreshCw, User } from "lucide-react";
 
 export function UserMenu() {
   const queryClient = useQueryClient();
-  const { data: session, isLoading, isError } = useSessionQuery();
+  const { data: session, isLoading, isError, refetch } = useSessionQuery();
 
   if (isLoading) {
     return (
@@ -22,7 +22,26 @@ export function UserMenu() {
     );
   }
 
-  if (isError || !session?.user) {
+  if (isError) {
+    return (
+      <div className="p-4 border-t">
+        <div className="flex items-center gap-2 text-sm text-red-500">
+          Failed to load session
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => refetch()}
+            className="ml-1 text-gray-500 hover:text-gray-700"
+          >
+            <RefreshCw className="h-3 w-3" />
+            Retry
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!session?.user) {
     return (
       <div className="p-4 border-t">
         <Link
@@ -53,7 +72,7 @@ export function UserMenu() {
         </Avatar>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-gray-900 truncate">
-            {user.name}
+            {user.name || "User"}
           </p>
           <p className="text-xs text-gray-500 truncate">{user.email}</p>
         </div>
