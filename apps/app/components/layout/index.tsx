@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Header } from "./header";
 import { Sidebar } from "./sidebar";
 
@@ -7,17 +6,12 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
   return (
-    <div className="h-screen flex bg-background">
-      <Sidebar isOpen={sidebarOpen} />
+    <div className="h-screen flex bg-[#F5F6FA]">
+      <Sidebar isOpen={true} />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header
-          isSidebarOpen={sidebarOpen}
-          onMenuToggle={() => setSidebarOpen(!sidebarOpen)}
-        />
+        <Header />
 
         <main className="flex-1 overflow-auto">
           <div className="h-full">{children}</div>
