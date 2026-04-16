@@ -2,6 +2,7 @@ import { Card, CardContent } from "@repo/ui";
 
 const transactions = [
   {
+    id: "tx-001",
     description: "Payment from Bonnie Green",
     date: "Apr 23, 2021",
     amount: "$2300",
@@ -9,6 +10,7 @@ const transactions = [
     statusColor: "bg-green-100 text-green-700",
   },
   {
+    id: "tx-002",
     description: "Payment refund to #00910",
     date: "Apr 23, 2021",
     amount: "-$670",
@@ -16,6 +18,7 @@ const transactions = [
     statusColor: "bg-green-100 text-green-700",
   },
   {
+    id: "tx-003",
     description: "Payment failed from #087651",
     date: "Apr 18, 2021",
     amount: "$234",
@@ -23,6 +26,7 @@ const transactions = [
     statusColor: "bg-red-100 text-red-700",
   },
   {
+    id: "tx-004",
     description: "Payment from Bonnie Green",
     date: "Apr 15, 2021",
     amount: "$5000",
@@ -30,6 +34,7 @@ const transactions = [
     statusColor: "bg-purple-100 text-purple-700",
   },
   {
+    id: "tx-005",
     description: "Payment from Jese Leos",
     date: "Apr 15, 2021",
     amount: "$2300",
@@ -37,6 +42,7 @@ const transactions = [
     statusColor: "bg-green-100 text-green-700",
   },
   {
+    id: "tx-006",
     description: "Payment from THEMSBERG LLC",
     date: "Apr 11, 2021",
     amount: "$280",
@@ -64,7 +70,7 @@ export function TransactionsTable() {
           </thead>
           <tbody>
             {transactions.map((tx) => (
-              <tr key={tx.description} className="border-b last:border-0">
+              <tr key={tx.id} className="border-b last:border-0">
                 <td className="py-3 text-sm font-medium">{tx.description}</td>
                 <td className="py-3 text-sm text-gray-500">{tx.date}</td>
                 <td className="py-3 text-sm font-semibold">{tx.amount}</td>

@@ -1,8 +1,11 @@
-import { useSessionQuery } from "@/lib/queries/session";
+import { signOut, useSessionQuery } from "@/lib/queries/session";
 import { Avatar, AvatarFallback, Skeleton } from "@repo/ui";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { LogOut, User } from "lucide-react";
 
 export function UserMenu() {
+  const queryClient = useQueryClient();
   const { data: session, isLoading, isError } = useSessionQuery();
 
   if (isLoading) {
@@ -22,13 +25,13 @@ export function UserMenu() {
   if (isError || !session?.user) {
     return (
       <div className="p-4 border-t">
-        <a
-          href="/login"
+        <Link
+          to="/login"
           className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600"
         >
           <LogOut className="h-4 w-4" />
           Sign in
-        </a>
+        </Link>
       </div>
     );
   }
@@ -58,6 +61,7 @@ export function UserMenu() {
           type="button"
           className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
           title="Sign out"
+          onClick={() => signOut(queryClient)}
         >
           <LogOut className="h-4 w-4" />
         </button>
