@@ -1,11 +1,15 @@
-import { getErrorMessage, isUnauthenticatedError } from "@/lib/errors";
+import {
+  getErrorMessage,
+  isForbiddenError,
+  isUnauthenticatedError,
+} from "@/lib/errors";
 import { sessionQueryKey } from "@/lib/queries/session";
 import { Button } from "@repo/ui";
 import {
   useQueryClient,
   useQueryErrorResetBoundary,
 } from "@tanstack/react-query";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, ShieldX } from "lucide-react";
 import { ErrorBoundary } from "react-error-boundary";
 
 interface ResetProps {
@@ -47,6 +51,23 @@ function AuthErrorFallback({ resetErrorBoundary }: ResetProps) {
   );
 }
 
+// Fallback for forbidden errors: the user is authenticated but lacks permission.
+function ForbiddenErrorFallback({ resetErrorBoundary }: ResetProps) {
+  return (
+    <div className="flex min-h-svh flex-col items-center justify-center p-6">
+      <div className="mx-auto max-w-md text-center">
+        <ShieldX className="mx-auto mb-4 h-12 w-12 text-destructive" />
+        <h1 className="mb-2 text-2xl font-bold">Access denied</h1>
+        <p className="mb-6 text-muted-foreground">
+          You don&apos;t have permission to access this page. If you think this
+          is a mistake, contact your organization administrator.
+        </p>
+        <Button onClick={resetErrorBoundary}>Try Again</Button>
+      </div>
+    </div>
+  );
+}
+
 interface ErrorFallbackProps {
   error: unknown;
   resetErrorBoundary: () => void;
@@ -73,14 +94,21 @@ interface ErrorBoundaryProps {
   children: React.ReactNode;
 }
 
-// Routes auth errors to AuthErrorFallback, others to GenericErrorFallback
+// Routes auth errors to the matching fallback:
+// - 401/UNAUTHORIZED -> AuthErrorFallback (sign-in recovery)
+// - 403/FORBIDDEN    -> ForbiddenErrorFallback (access denied)
+// - everything else  -> GenericErrorFallback
 function AuthAwareErrorFallback({
   error,
   resetErrorBoundary,
 }: ErrorFallbackProps) {
-  return isUnauthenticatedError(error) ? (
-    <AuthErrorFallback resetErrorBoundary={resetErrorBoundary} />
-  ) : (
+  if (isUnauthenticatedError(error)) {
+    return <AuthErrorFallback resetErrorBoundary={resetErrorBoundary} />;
+  }
+  if (isForbiddenError(error)) {
+    return <ForbiddenErrorFallback resetErrorBoundary={resetErrorBoundary} />;
+  }
+  return (
     <GenericErrorFallback
       error={error}
       resetErrorBoundary={resetErrorBoundary}
@@ -89,8 +117,8 @@ function AuthAwareErrorFallback({
 }
 
 // Auth error boundary for protected routes only.
-// Catches auth errors (tRPC UNAUTHORIZED or HTTP 401) and shows recovery UI.
-// 403 (forbidden) falls through to generic handler since user IS authenticated.
+// Catches auth errors (tRPC UNAUTHORIZED or HTTP 401) and shows sign-in recovery UI.
+// 403 (forbidden) shows a dedicated access-denied screen since the user IS authenticated.
 export function AuthErrorBoundary({ children }: ErrorBoundaryProps) {
   const queryClient = useQueryClient();
   const { reset } = useQueryErrorResetBoundary();

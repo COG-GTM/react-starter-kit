@@ -34,6 +34,18 @@ export function isUnauthenticatedError(error: unknown): boolean {
   return getErrorStatus(error) === 401;
 }
 
+// Check if error indicates a forbidden state (403).
+// Maps tRPC FORBIDDEN code and HTTP 403 status to a semantic boolean.
+// Distinct from 401: the user IS authenticated but lacks permission for the resource.
+export function isForbiddenError(error: unknown): boolean {
+  // tRPC errors expose typed code
+  if (error && typeof error === "object" && "data" in error) {
+    const data = (error as { data?: { code?: string } }).data;
+    if (data?.code === "FORBIDDEN") return true;
+  }
+  return getErrorStatus(error) === 403;
+}
+
 // Safely extract message from any thrown value
 export function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message;
