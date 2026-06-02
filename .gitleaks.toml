@@ -1,0 +1,13 @@
+# Gitleaks configuration.
+# Extends the built-in ruleset and allowlists the committed `.env` template,
+# which holds only shared defaults/placeholders and local dev DB strings
+# (e.g. postgres://postgres:postgres@localhost). Real secrets live in
+# `.env.local`, which is git-ignored.
+title = "react-starter-kit gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allowlist the shared .env defaults template"
+paths = ['''^\.env$''']

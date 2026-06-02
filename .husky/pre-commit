@@ -1,4 +1,15 @@
 #!/usr/bin/env sh
 set -e
 
+# Prevent committing real secrets in the shared .env template.
+# .env holds shared defaults/placeholders only; real credentials belong in .env.local.
+if git diff --cached --name-only | grep -q "^\.env$"; then
+  if git diff --cached -- .env \
+    | grep -E "^\+(BETTER_AUTH_SECRET|GOOGLE_CLIENT_SECRET|OPENAI_API_KEY|RESEND_API_KEY|STRIPE_SECRET_KEY|STRIPE_WEBHOOK_SECRET|ALGOLIA_ADMIN_API_KEY)=.+" \
+    | grep -vqE "=x{4,}|=$"; then
+    echo "ERROR: Potential real secret detected in .env. Use .env.local instead."
+    exit 1
+  fi
+fi
+
 bunx lint-staged

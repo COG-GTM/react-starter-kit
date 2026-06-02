@@ -48,3 +48,25 @@ export const env =
  * Inferred from the Zod schema to ensure type safety.
  */
 export type Env = z.infer<typeof envSchema>;
+
+/** Validated environment variables (alias of {@link Env}). */
+export type ValidatedEnv = Env;
+
+/**
+ * Validates the given environment against {@link envSchema}, throwing a single
+ * error that lists every missing or malformed variable. Use this to fail fast
+ * at startup so misconfiguration surfaces with a clear message instead of an
+ * obscure runtime failure deep in a request handler.
+ *
+ * @throws {Error} When one or more variables are missing or invalid.
+ */
+export function validateEnv(env: Record<string, unknown>): ValidatedEnv {
+  const result = envSchema.safeParse(env);
+  if (!result.success) {
+    const formatted = result.error.issues
+      .map((i) => `  - ${i.path.join(".")}: ${i.message}`)
+      .join("\n");
+    throw new Error(`Environment validation failed:\n${formatted}`);
+  }
+  return result.data;
+}

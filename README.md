@@ -90,6 +90,9 @@ This project follows [Vite env conventions](https://vite.dev/guide/env-and-mode#
 - `.env.local` is git-ignored and should contain your real credentials
 - `.env.local` values override `.env`
 
+> ⚠️ **Never put real secrets in `.env`** — it is committed to git as a shared-defaults template.
+> Always use `.env.local` for credentials. The API worker fails to start if required secrets (e.g. `BETTER_AUTH_SECRET`) are missing or invalid.
+
 ```bash
 cp .env .env.local  # then replace placeholder values with real ones
 ```

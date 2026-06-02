@@ -12,7 +12,7 @@ import app from "./lib/app.js";
 import { createAuth } from "./lib/auth.js";
 import type { AppContext } from "./lib/context.js";
 import { createDb } from "./lib/db.js";
-import type { Env } from "./lib/env.js";
+import { type Env, validateEnv } from "./lib/env.js";
 import {
   errorHandler,
   notFoundHandler,
@@ -38,8 +38,18 @@ worker.use(secureHeaders());
 worker.use(requestId({ generator: requestIdGenerator }));
 worker.use(logger());
 
+// Validate required environment once, on the first request, so the worker fails
+// fast with a clear message if secrets are missing instead of erroring deep in a
+// handler. Workers expose env via bindings, so this can't run at module load.
+let envValidated = false;
+
 // Initialize shared context for all requests
 worker.use(async (c, next) => {
+  if (!envValidated) {
+    validateEnv(c.env);
+    envValidated = true;
+  }
+
   const db = createDb(c.env.HYPERDRIVE_CACHED);
   const dbDirect = createDb(c.env.HYPERDRIVE_DIRECT);
   const auth = createAuth(db, c.env);
