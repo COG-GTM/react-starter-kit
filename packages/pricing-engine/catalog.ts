@@ -78,8 +78,11 @@ export const CATALOG: CatalogProduct[] = [
 
 /**
  * Catalog indexed by SKU for O(1) lookups during receipt formatting.
+ *
+ * Typed with `| undefined` because not every SKU presented at checkout is a
+ * catalog product (e.g. loyalty rewards), so callers must guard the lookup.
  */
-export const CATALOG_BY_SKU: Record<string, CatalogProduct> =
+export const CATALOG_BY_SKU: Record<string, CatalogProduct | undefined> =
   Object.fromEntries(CATALOG.map((product) => [product.sku, product]));
 
 export interface TaxRegionConfig {
