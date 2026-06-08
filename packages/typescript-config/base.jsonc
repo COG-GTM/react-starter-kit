@@ -19,6 +19,8 @@
       "@repo/api/*": ["apps/api/*"],
       "@repo/core": ["packages/core"],
       "@repo/core/*": ["packages/core/*"],
+      "@repo/pricing-engine": ["packages/pricing-engine"],
+      "@repo/pricing-engine/*": ["packages/pricing-engine/*"],
       "@repo/db": ["db"],
       "@repo/db/*": ["db/*"],
       "@repo/ws-protocol": ["packages/ws-protocol"],
