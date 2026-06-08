@@ -31,8 +31,8 @@ export function formatLineItems(items: CartItem[]): ReceiptLine[] {
     const product = CATALOG_BY_SKU[item.sku];
     return {
       sku: item.sku,
-      name: product.name,
-      category: product.category,
+      name: product?.name ?? item.sku,
+      category: product?.category ?? "other",
       qty: item.qty,
       lineTotal: Math.round(item.price * item.qty * 100) / 100,
     };
