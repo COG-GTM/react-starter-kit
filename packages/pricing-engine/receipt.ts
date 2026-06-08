@@ -24,15 +24,18 @@ export interface ReceiptLine {
  * Expands each cart line into a printable receipt row by resolving the SKU
  * against the shared catalog for display name and category.
  *
- * Every SKU passed in is expected to be present in CATALOG_BY_SKU.
+ * Not every SKU is a merchandise catalog product — e.g. loyalty rewards and
+ * other non-catalog line items. When a SKU is absent from CATALOG_BY_SKU the
+ * line is still rendered using the SKU as its display name and an "other"
+ * category, rather than dereferencing an undefined product.
  */
 export function formatLineItems(items: CartItem[]): ReceiptLine[] {
   return items.map((item) => {
     const product = CATALOG_BY_SKU[item.sku];
     return {
       sku: item.sku,
-      name: product.name,
-      category: product.category,
+      name: product?.name ?? item.sku,
+      category: product?.category ?? "other",
       qty: item.qty,
       lineTotal: Math.round(item.price * item.qty * 100) / 100,
     };
