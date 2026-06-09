@@ -5,6 +5,7 @@
  */
 
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
@@ -37,6 +38,26 @@ app.notFound(notFoundHandler);
 
 // Standard middleware
 app.use(secureHeaders());
+
+// Vite app dev server and Astro web dev server origins
+const DEV_ALLOWED_ORIGINS = ["http://localhost:5173", "http://localhost:4321"];
+
+app.use(
+  cors({
+    origin: (origin, c) => {
+      const appOrigin =
+        c.req.header("x-forwarded-origin") ||
+        process.env.APP_ORIGIN ||
+        "http://localhost:5173";
+      const allowed = new Set([appOrigin, ...DEV_ALLOWED_ORIGINS]);
+      return origin && allowed.has(origin) ? origin : null;
+    },
+    credentials: true,
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    maxAge: 86400,
+  }),
+);
 app.use(requestId());
 app.use(logger());
 

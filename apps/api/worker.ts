@@ -5,6 +5,7 @@
  */
 
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { requestId } from "hono/request-id";
 import { secureHeaders } from "hono/secure-headers";
@@ -35,6 +36,15 @@ worker.notFound(notFoundHandler);
 
 // Standard middleware
 worker.use(secureHeaders());
+worker.use(
+  cors({
+    origin: (origin, c) => (origin === c.env.APP_ORIGIN ? origin : null),
+    credentials: true,
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    maxAge: 86400,
+  }),
+);
 worker.use(requestId({ generator: requestIdGenerator }));
 worker.use(logger());
 
