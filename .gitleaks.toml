@@ -1,0 +1,16 @@
+# Gitleaks configuration.
+# Extends the built-in ruleset. We intentionally do NOT allowlist the whole
+# `.env` file so real secrets accidentally committed there are still caught;
+# instead we allowlist only the local-dev Postgres connection strings that the
+# committed `.env` template legitimately contains. Real secrets belong in
+# `.env.local`, which is git-ignored.
+title = "react-starter-kit gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Local development Postgres connection strings in the .env template"
+regexes = [
+  '''postgres://postgres:postgres@localhost''',
+]
