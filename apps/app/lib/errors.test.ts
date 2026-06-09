@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   getErrorMessage,
   getErrorStatus,
+  isForbiddenError,
   isUnauthenticatedError,
 } from "./errors";
 
@@ -110,5 +111,42 @@ describe("isUnauthenticatedError", () => {
 
   it("returns false for tRPC FORBIDDEN code", () => {
     expect(isUnauthenticatedError({ data: { code: "FORBIDDEN" } })).toBe(false);
+  });
+});
+
+describe("isForbiddenError", () => {
+  it("returns true for 403 status", () => {
+    expect(isForbiddenError({ status: 403 })).toBe(true);
+  });
+
+  it("returns false for 401 status (authentication, not authorization)", () => {
+    expect(isForbiddenError({ status: 401 })).toBe(false);
+  });
+
+  it("returns false for other status codes", () => {
+    expect(isForbiddenError({ status: 500 })).toBe(false);
+    expect(isForbiddenError({ status: 404 })).toBe(false);
+  });
+
+  it("returns false for non-error values", () => {
+    expect(isForbiddenError(null)).toBe(false);
+    expect(isForbiddenError("error")).toBe(false);
+    expect(isForbiddenError({})).toBe(false);
+  });
+
+  it("detects 403 in nested cause", () => {
+    expect(isForbiddenError({ cause: { status: 403 } })).toBe(true);
+  });
+
+  it("detects 403 in nested response (axios-style)", () => {
+    expect(isForbiddenError({ response: { status: 403 } })).toBe(true);
+  });
+
+  it("returns true for tRPC FORBIDDEN code", () => {
+    expect(isForbiddenError({ data: { code: "FORBIDDEN" } })).toBe(true);
+  });
+
+  it("returns false for tRPC UNAUTHORIZED code", () => {
+    expect(isForbiddenError({ data: { code: "UNAUTHORIZED" } })).toBe(false);
   });
 });
