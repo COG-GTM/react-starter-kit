@@ -10,6 +10,12 @@ export interface CartItem {
   sku: string;
   price: number;
   qty: number;
+  /**
+   * Optional display name for the line item. Used as a fallback when the SKU is
+   * not present in the catalog (e.g. loyalty rewards and other non-merchandise
+   * line items that are injected server-side and never sold as catalog products).
+   */
+  name?: string;
 }
 
 export interface ReceiptLine {
@@ -24,15 +30,18 @@ export interface ReceiptLine {
  * Expands each cart line into a printable receipt row by resolving the SKU
  * against the shared catalog for display name and category.
  *
- * Every SKU passed in is expected to be present in CATALOG_BY_SKU.
+ * Not every SKU is guaranteed to exist in CATALOG_BY_SKU: storefronts inject
+ * non-merchandise line items (loyalty rewards, fees) that are not catalog
+ * products. Those fall back to the line item's own name and an "other"
+ * category instead of dereferencing an undefined catalog entry.
  */
 export function formatLineItems(items: CartItem[]): ReceiptLine[] {
   return items.map((item) => {
     const product = CATALOG_BY_SKU[item.sku];
     return {
       sku: item.sku,
-      name: product.name,
-      category: product.category,
+      name: product?.name ?? item.name ?? "Unknown item",
+      category: product?.category ?? "other",
       qty: item.qty,
       lineTotal: Math.round(item.price * item.qty * 100) / 100,
     };
