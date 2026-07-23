@@ -10,6 +10,13 @@ export interface CartItem {
   sku: string;
   price: number;
   qty: number;
+  /**
+   * Optional display overrides for line items whose SKU is not a catalog
+   * product (e.g. loyalty rewards, promotional credits). When the SKU is
+   * absent from CATALOG_BY_SKU these are used for the receipt row.
+   */
+  name?: string;
+  category?: string;
 }
 
 export interface ReceiptLine {
@@ -24,15 +31,17 @@ export interface ReceiptLine {
  * Expands each cart line into a printable receipt row by resolving the SKU
  * against the shared catalog for display name and category.
  *
- * Every SKU passed in is expected to be present in CATALOG_BY_SKU.
+ * SKUs missing from CATALOG_BY_SKU (e.g. loyalty rewards or promotional
+ * credits injected by a storefront) are not catalog products, so they fall
+ * back to the line item's own name/category, then to the SKU itself.
  */
 export function formatLineItems(items: CartItem[]): ReceiptLine[] {
   return items.map((item) => {
     const product = CATALOG_BY_SKU[item.sku];
     return {
       sku: item.sku,
-      name: product.name,
-      category: product.category,
+      name: product?.name ?? item.name ?? item.sku,
+      category: product?.category ?? item.category ?? "other",
       qty: item.qty,
       lineTotal: Math.round(item.price * item.qty * 100) / 100,
     };
