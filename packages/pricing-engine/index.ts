@@ -12,7 +12,11 @@ export type { CatalogProduct, TaxRegionConfig } from "./catalog";
 export { getApplicableDiscount, computeOrderTotal } from "./pricing";
 export type { DiscountTier, OrderTotals } from "./pricing";
 
-export { formatLineItems, buildCheckoutReceipt } from "./receipt";
+export {
+  formatLineItems,
+  buildCheckoutReceipt,
+  NON_CATALOG_CATEGORY,
+} from "./receipt";
 export type {
   CartItem,
   ReceiptLine,
