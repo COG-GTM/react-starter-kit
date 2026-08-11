@@ -10,7 +10,12 @@ export interface CartItem {
   sku: string;
   price: number;
   qty: number;
+  /** Display name for lines that are not merchandise catalog products. */
+  name?: string;
 }
+
+/** Category assigned to lines with no catalog product (loyalty rewards, fees). */
+export const NON_CATALOG_CATEGORY = "non-merchandise";
 
 export interface ReceiptLine {
   sku: string;
@@ -24,15 +29,16 @@ export interface ReceiptLine {
  * Expands each cart line into a printable receipt row by resolving the SKU
  * against the shared catalog for display name and category.
  *
- * Every SKU passed in is expected to be present in CATALOG_BY_SKU.
+ * Non-merchandise lines (loyalty rewards, fees) carry SKUs that are absent from
+ * the catalog, so they fall back to the name supplied on the cart line.
  */
 export function formatLineItems(items: CartItem[]): ReceiptLine[] {
   return items.map((item) => {
     const product = CATALOG_BY_SKU[item.sku];
     return {
       sku: item.sku,
-      name: product.name,
-      category: product.category,
+      name: product?.name ?? item.name ?? item.sku,
+      category: product?.category ?? NON_CATALOG_CATEGORY,
       qty: item.qty,
       lineTotal: Math.round(item.price * item.qty * 100) / 100,
     };
