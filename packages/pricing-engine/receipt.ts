@@ -3,6 +3,7 @@
  */
 
 import { CATALOG_BY_SKU } from "./catalog";
+import type { CatalogProduct } from "./catalog";
 import { computeOrderTotal } from "./pricing";
 import type { OrderTotals } from "./pricing";
 
@@ -10,6 +11,10 @@ export interface CartItem {
   sku: string;
   price: number;
   qty: number;
+  /** Display name for lines that are not merchandise (e.g. loyalty rewards). */
+  name?: string;
+  /** Category for lines that are not merchandise. */
+  category?: string;
 }
 
 export interface ReceiptLine {
@@ -24,15 +29,16 @@ export interface ReceiptLine {
  * Expands each cart line into a printable receipt row by resolving the SKU
  * against the shared catalog for display name and category.
  *
- * Every SKU passed in is expected to be present in CATALOG_BY_SKU.
+ * Lines whose SKU is not merchandise (loyalty rewards, promotional credits)
+ * have no catalog entry and fall back to the name/category on the cart item.
  */
 export function formatLineItems(items: CartItem[]): ReceiptLine[] {
   return items.map((item) => {
-    const product = CATALOG_BY_SKU[item.sku];
+    const product: CatalogProduct | undefined = CATALOG_BY_SKU[item.sku];
     return {
       sku: item.sku,
-      name: product.name,
-      category: product.category,
+      name: product?.name ?? item.name ?? item.sku,
+      category: product?.category ?? item.category ?? "other",
       qty: item.qty,
       lineTotal: Math.round(item.price * item.qty * 100) / 100,
     };
