@@ -50,6 +50,14 @@ describe("formatLineItems", () => {
       category: UNCATALOGED_CATEGORY,
     });
   });
+
+  it("does not treat Object.prototype members as catalog products", () => {
+    const [line] = formatLineItems([{ sku: "constructor", price: 1, qty: 1 }]);
+    expect(line).toMatchObject({
+      name: "constructor",
+      category: UNCATALOGED_CATEGORY,
+    });
+  });
 });
 
 describe("buildCheckoutReceipt", () => {

@@ -31,11 +31,14 @@ export interface ReceiptLine {
  *
  * Non-merchandise SKUs (loyalty rewards, promotional credits, gift wrapping)
  * are legitimately absent from the catalog, so they fall back to the display
- * name supplied on the cart line.
+ * name supplied on the cart line. Lookups are own-property only so SKUs that
+ * collide with `Object.prototype` members are not mistaken for products.
  */
 export function formatLineItems(items: CartItem[]): ReceiptLine[] {
   return items.map((item) => {
-    const product = CATALOG_BY_SKU[item.sku];
+    const product = Object.hasOwn(CATALOG_BY_SKU, item.sku)
+      ? CATALOG_BY_SKU[item.sku]
+      : undefined;
     return {
       sku: item.sku,
       name: product?.name ?? item.name ?? item.sku,
