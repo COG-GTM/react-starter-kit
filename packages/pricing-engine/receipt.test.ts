@@ -40,6 +40,27 @@ describe("formatLineItems", () => {
     ]);
   });
 
+  it("does not treat inherited properties as catalog products", () => {
+    expect(
+      formatLineItems([
+        {
+          sku: "constructor",
+          name: "Weird Promo",
+          price: 0,
+          qty: 1,
+        },
+      ]),
+    ).toEqual([
+      {
+        sku: "constructor",
+        name: "Weird Promo",
+        category: "other",
+        qty: 1,
+        lineTotal: 0,
+      },
+    ]);
+  });
+
   it("falls back to the SKU and other category without line metadata", () => {
     expect(
       formatLineItems([{ sku: "PROMO-UNKNOWN", price: 0, qty: 1 }]),
