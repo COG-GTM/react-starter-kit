@@ -8,6 +8,7 @@ import type { OrderTotals } from "./pricing";
 
 export interface CartItem {
   sku: string;
+  name?: string;
   price: number;
   qty: number;
 }
@@ -24,15 +25,18 @@ export interface ReceiptLine {
  * Expands each cart line into a printable receipt row by resolving the SKU
  * against the shared catalog for display name and category.
  *
- * Every SKU passed in is expected to be present in CATALOG_BY_SKU.
+ * SKUs not in the catalog, such as loyalty rewards, use the cart line's own
+ * name (or the SKU) and category "other".
  */
 export function formatLineItems(items: CartItem[]): ReceiptLine[] {
   return items.map((item) => {
-    const product = CATALOG_BY_SKU[item.sku];
+    const product = Object.hasOwn(CATALOG_BY_SKU, item.sku)
+      ? CATALOG_BY_SKU[item.sku]
+      : undefined;
     return {
       sku: item.sku,
-      name: product.name,
-      category: product.category,
+      name: product?.name ?? item.name ?? item.sku,
+      category: product?.category ?? "other",
       qty: item.qty,
       lineTotal: Math.round(item.price * item.qty * 100) / 100,
     };
