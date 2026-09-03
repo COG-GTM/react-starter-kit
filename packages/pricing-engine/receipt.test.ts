@@ -45,6 +45,18 @@ describe("pricing engine receipt formatting", () => {
     expect(lineItem.category).toBe("other");
   });
 
+  it("does not resolve prototype properties as catalog products", () => {
+    const lineItems = formatLineItems([
+      { sku: "constructor", name: "Ctor Promo", price: 0, qty: 1 },
+      { sku: "toString", name: "Str Promo", price: 0, qty: 1 },
+    ]);
+
+    expect(lineItems).toMatchObject([
+      { name: "Ctor Promo", category: "other" },
+      { name: "Str Promo", category: "other" },
+    ]);
+  });
+
   it("totals only the priced item in a mixed cart", () => {
     const receipt = buildCheckoutReceipt({
       items: [
