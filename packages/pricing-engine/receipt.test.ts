@@ -56,6 +56,16 @@ describe("pricing-engine receipt formatting", () => {
     });
   });
 
+  it("ignores inherited catalog properties", () => {
+    const receipt = buildCheckoutReceipt({
+      items: [{ sku: "constructor", name: "Weird", price: 1, qty: 1 }],
+      region: "US",
+    });
+
+    expect(receipt.lineItems[0].name).toBe("Weird");
+    expect(receipt.lineItems[0].category).toBe("other");
+  });
+
   it("returns an empty receipt for undefined items", () => {
     const receipt = buildCheckoutReceipt({
       items: undefined as unknown as CartItem[],

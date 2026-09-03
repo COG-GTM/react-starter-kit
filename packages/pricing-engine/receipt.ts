@@ -30,7 +30,9 @@ export interface ReceiptLine {
  */
 export function formatLineItems(items: CartItem[]): ReceiptLine[] {
   return items.map((item) => {
-    const product = CATALOG_BY_SKU[item.sku];
+    const product = Object.hasOwn(CATALOG_BY_SKU, item.sku)
+      ? CATALOG_BY_SKU[item.sku]
+      : undefined;
     return {
       sku: item.sku,
       name: product?.name ?? item.name ?? item.sku,
