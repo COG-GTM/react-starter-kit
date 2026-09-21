@@ -214,6 +214,15 @@
         "typescript": "~5.9.3",
       },
     },
+    "packages/promo-engine": {
+      "name": "@repo/promo-engine",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@repo/typescript-config": "workspace:*",
+        "@types/bun": "^1.3.9",
+        "typescript": "~5.9.3",
+      },
+    },
     "packages/typescript-config": {
       "name": "@repo/typescript-config",
       "version": "0.0.0",
@@ -841,6 +850,8 @@
     "@repo/email": ["@repo/email@workspace:apps/email"],
 
     "@repo/pricing-engine": ["@repo/pricing-engine@workspace:packages/pricing-engine"],
+
+    "@repo/promo-engine": ["@repo/promo-engine@workspace:packages/promo-engine"],
 
     "@repo/scripts": ["@repo/scripts@workspace:scripts"],
 
