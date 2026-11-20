@@ -16,6 +16,7 @@ my-app/
 ├── packages/
 │   ├── ui/            # shadcn/ui component library
 │   ├── core/          # Shared utilities
+│   ├── pricing-engine/ # Checkout pricing and receipts
 │   ├── ws-protocol/   # WebSocket protocol template
 │   └── typescript-config/  # Shared tsconfig presets
 ├── db/                # Drizzle ORM schemas and migrations
@@ -49,6 +50,7 @@ Cloudflare Worker running [Hono](https://hono.dev) for HTTP routing and [tRPC](h
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
 | `packages/ui`                | [shadcn/ui](https://ui.shadcn.com) components (new-york style) with Tailwind CSS v4. Add components with `bun ui:add <name>`. |
 | `packages/core`              | Shared utilities and constants used across apps.                                                                              |
+| `packages/pricing-engine`    | Checkout pricing: product catalog, regional tax, volume discounts and receipt formatting. Not imported by any app yet.        |
 | `packages/ws-protocol`       | WebSocket message protocol template for real-time features.                                                                   |
 | `packages/typescript-config` | Shared `tsconfig.json` presets for consistent compiler settings.                                                              |
 

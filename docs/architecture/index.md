@@ -2,6 +2,12 @@
 
 React Starter Kit runs on three Cloudflare Workers connected by [service bindings](https://developers.cloudflare.com/workers/runtime-apis/bindings/service-bindings/). A single domain receives all traffic – the **web** worker routes each request to the right destination without any cross-worker public URLs.
 
+## System Diagram
+
+![React Starter Kit system architecture](./diagrams/architecture.svg)
+
+The diagram is generated from an editable Graphviz source, [`diagrams/architecture.dot`](https://github.com/COG-GTM/react-starter-kit/blob/main/docs/architecture/diagrams/architecture.dot). After editing it, run `docs/architecture/diagrams/render.sh` (requires [Graphviz](https://graphviz.org/download/)) to regenerate `architecture.png` and `architecture.svg`. Solid arrows are runtime requests; dashed arrows are build-time workspace imports.
+
 ## Request Flow
 
 ```mermaid
@@ -48,6 +54,10 @@ The web worker is the only worker with a public route (`example.com/*`). It deci
 - `/login`, `/signup`, `/settings`, `/analytics`, `/reports`, `/_app/*` – forwarded to the app worker
 - `/` – routed by [auth hint cookie](#auth-hint-cookie) (app if signed in, marketing site if not)
 - Everything else – served from the web worker's own static assets (marketing pages)
+
+::: warning
+The forwarded list is explicit. The SPA also defines `/dashboard`, `/users` and `/about` (`apps/app/routes/(app)/`), which the web worker does not forward, so a full page load of those paths in a deployed environment falls through to the marketing assets. Client-side navigation inside the SPA is unaffected. Add a matching `app.all()` line in `apps/web/worker.ts` when you add a top-level SPA route.
+:::
 
 ```ts
 // apps/web/worker.ts (simplified)
@@ -150,24 +160,51 @@ See [ADR-001](/adr/001-auth-hint-cookie) for the full decision record and [Sessi
 
 ## Environments
 
-| Environment | Workers         | Domain                | Database       | Deploy command                  |
-| ----------- | --------------- | --------------------- | -------------- | ------------------------------- |
-| Development | `wrangler dev`  | `localhost:5173`      | Dev branch     | `bun dev`                       |
-| Preview     | `*-preview`     | `preview.example.com` | Preview branch | `wrangler deploy --env preview` |
-| Staging     | `*-staging`     | `staging.example.com` | Staging branch | `wrangler deploy --env staging` |
-| Production  | `*` (no suffix) | `example.com`         | Main branch    | `wrangler deploy`               |
+| Environment | Workers                                                                      | Domain                | Database                                                                                      | Deploy command                  |
+| ----------- | ---------------------------------------------------------------------------- | --------------------- | --------------------------------------------------------------------------------------------- | ------------------------------- |
+| Development | Local dev servers (see [Edge > Local Development](./edge#local-development)) | `localhost:5173`      | `DATABASE_URL` in `.env` / `.env.local` (defaults to local Postgres `localhost:5432/example`) | `bun dev`                       |
+| Preview     | `*-preview`                                                                  | `preview.example.com` | Preview branch                                                                                | `wrangler deploy --env preview` |
+| Staging     | `*-staging`                                                                  | `staging.example.com` | Staging branch                                                                                | `wrangler deploy --env staging` |
+| Production  | `*` (no suffix)                                                              | `example.com`         | Main branch                                                                                   | `wrangler deploy`               |
 
 Each environment has its own Hyperdrive bindings, service binding targets, and `APP_ORIGIN` / `ALLOWED_ORIGINS` variables. See [Edge > Service Bindings](./edge#service-bindings) for the full wrangler config.
 
+## Workspaces and Shared Packages
+
+The workers are built from Bun workspaces. Shared packages are imported at build time; they are not deployed on their own.
+
+| Workspace                    | Package                   | Used by         | Purpose                                                                                   |
+| ---------------------------- | ------------------------- | --------------- | ----------------------------------------------------------------------------------------- |
+| `apps/email`                 | `@repo/email`             | api             | React Email templates (OTP, invitations), compiled before the API                         |
+| `db`                         | `@repo/db`                | api             | Drizzle ORM schema, migrations and seeds for Neon PostgreSQL                              |
+| `packages/core`              | `@repo/core`              | api             | Shared utilities                                                                          |
+| `packages/ui`                | `@repo/ui`                | app, web        | shadcn/ui components (new-york style)                                                     |
+| `packages/ws-protocol`       | `@repo/ws-protocol`       | – (template)    | Type-safe WebSocket message protocol, not yet imported by any app                         |
+| `packages/pricing-engine`    | `@repo/pricing-engine`    | – (no consumer) | Checkout pricing: product catalog, regional tax, Pro volume discounts, receipt formatting |
+| `packages/typescript-config` | `@repo/typescript-config` | all             | Shared `tsconfig` presets                                                                 |
+
+### Pricing Engine
+
+`packages/pricing-engine` was added in the COG-GTM fork as a shared checkout pricing and receipt package. It is plain TypeScript with no runtime dependencies and exports from `index.ts`:
+
+- `CATALOG` / `CATALOG_BY_SKU` – the product catalog (SKU, name, category, unit price)
+- `TAX_REGIONS` – tax rate and currency for `US`, `CA` and `MX`
+- `getApplicableDiscount(subtotal)` – volume-discount tier: 5% from 500, 10% from 2,000
+- `computeOrderTotal(subtotal, region)` – subtotal, tax, discount and total; throws `INVALID_REGION` for an unknown region
+- `formatLineItems(items)` / `buildCheckoutReceipt(order)` – receipt rows and totals for a cart
+
+The package is registered in the root `tsconfig.json` project references and in the `@repo/pricing-engine` path alias, so `bun typecheck` covers it. No app, worker or tRPC procedure imports it yet, and it has no tests in the Vitest projects (`apps/api`, `apps/app`). See [`packages/pricing-engine/README.md`](https://github.com/COG-GTM/react-starter-kit/blob/main/packages/pricing-engine/README.md) for usage.
+
 ## Build Order
 
-The workspaces must build in dependency order:
+`bun run build` builds the four deployable workspaces with `bun --filter`, which orders them by workspace dependencies:
 
 ```
-email → web → api → app
+email → api        (the API imports the compiled templates)
+web, app           (independent; no build-time dependency on email or api)
 ```
 
-Email templates are compiled first because the API server imports them. The `bun build` command handles this automatically.
+CI (`.github/workflows/ci.yml`) runs `bun email:build` before `bun tsc --build`, because type checking the API also needs the compiled templates.
 
 ## Key Invariants
 

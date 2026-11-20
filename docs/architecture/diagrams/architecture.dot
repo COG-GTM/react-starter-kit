@@ -1,0 +1,61 @@
+// React Starter Kit (COG-GTM fork) – system architecture.
+// Edit this file, then run ./render.sh to regenerate architecture.png and architecture.svg.
+digraph architecture {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=18, labelloc=t, nodesep=0.45, ranksep=0.65, pad=0.3, newrank=true,
+         label="React Starter Kit – system architecture (COG-GTM main)"];
+  node  [shape=box, style="rounded,filled", fontname="DejaVu Sans", fontsize=15, fillcolor=white, color="#4b5563", margin="0.18,0.1"];
+  edge  [fontname="DejaVu Sans", fontsize=12, color="#374151"];
+
+  browser [label="Browser", shape=oval, fillcolor="#e0f2fe"];
+
+  subgraph cluster_edge {
+    label="Cloudflare Workers (one public domain)"; fontsize=16; style="rounded,filled"; fillcolor="#fff7ed"; color="#f97316";
+    web [label="web worker  (apps/web)\nHono edge router worker.ts\n+ Astro marketing pages (ASSETS)"];
+    app [label="app worker  (apps/app)\nReact 19 SPA static assets\nTanStack Router · Query · Jotai"];
+    api [label="api worker  (apps/api)\nHono · tRPC · Better Auth\nnodejs_compat"];
+    {rank=same; app; api;}
+  }
+
+  subgraph cluster_data {
+    label="Data"; fontsize=16; style="rounded,filled"; fillcolor="#ecfdf5"; color="#10b981";
+    hyperdrive [label="Cloudflare Hyperdrive\nHYPERDRIVE_CACHED · HYPERDRIVE_DIRECT"];
+    neon [label="Neon PostgreSQL\nschema + migrations in db/ (Drizzle)", shape=cylinder];
+  }
+
+  subgraph cluster_ext {
+    label="External services"; fontsize=16; style="rounded,filled"; fillcolor="#f5f3ff"; color="#8b5cf6";
+    stripe [label="Stripe\nsubscriptions (optional)"];
+    resend [label="Resend\nOTP + transactional email"];
+    google [label="Google OAuth"];
+    openai [label="OpenAI"];
+    stripe -> resend -> google -> openai [style=invis];
+  }
+
+  subgraph cluster_pkgs {
+    label="Shared workspaces (build-time imports)"; fontsize=16; style="rounded,filled"; fillcolor="#f3f4f6"; color="#6b7280";
+    ui [label="packages/ui\nshadcn/ui components"];
+    core [label="packages/core\nshared utilities"];
+    email [label="apps/email\nReact Email templates"];
+    dbpkg [label="db (@repo/db)\nDrizzle schema"];
+    wsp [label="packages/ws-protocol\nWebSocket protocol template\n(no consumer yet)", style="rounded,filled,dashed"];
+    pricing [label="packages/pricing-engine\ncheckout pricing + receipts\n(no consumer yet)", style="rounded,filled,dashed", fillcolor="#fef9c3"];
+    {rank=same; ui; core;}
+    {rank=same; email; dbpkg;}
+    {rank=same; wsp; pricing;}
+    ui -> email -> wsp [style=invis]; core -> dbpkg -> pricing [style=invis];
+  }
+
+  infra [label="infra/ (Terraform)\nworkers · Hyperdrive · DNS", shape=note, fillcolor="#fefce8"];
+
+  browser -> web [label=" all requests", penwidth=2];
+  web -> app [label=" /_app/*, /login, /signup,\n /settings, /analytics, /reports,\n / with auth-hint cookie", penwidth=2];
+  web -> api [label=" /api/*", penwidth=2];
+  api -> hyperdrive [label=" postgres.js"];
+  hyperdrive -> neon;
+  api -> stripe; api -> resend; api -> google; api -> openai;
+
+  edge [style=dashed, color="#6b7280", arrowhead=empty];
+  app -> ui; web -> ui;
+  api -> core; api -> email; api -> dbpkg;
+  infra -> web [label=" provisions", constraint=false];
+}

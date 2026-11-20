@@ -167,8 +167,8 @@ infra/
 │   │   └── outputs.tf
 │   └── hybrid/        # Database and other resources
 ├── modules/
-│   ├── cloudflare/    # Worker, Hyperdrive, DNS modules
-│   └── gcp/
+│   ├── cloudflare/    # worker, hyperdrive, dns, r2-bucket modules
+│   └── gcp/           # cloud-run, cloud-sql, gcs modules (hybrid stack)
 ├── envs/              # Per-environment Terraform root modules
 └── templates/
 ```
@@ -193,16 +193,20 @@ The `worker_suffix` local resolves to `""` for production and `"-${var.environme
 
 ## Local Development
 
-`bun dev` starts all three workers concurrently with Wrangler's dev mode:
+`bun dev` runs the `dev` script of the web, api and app workspaces concurrently. Locally they are plain dev servers, not Wrangler workers, so there are no service bindings and the web worker's routing (`apps/web/worker.ts`) does not run:
 
-| Worker | Port   | Notes                                   |
-| ------ | ------ | --------------------------------------- |
-| web    | `5173` | Entry point – open this in your browser |
-| app    | `5174` | Accessed via service binding from web   |
-| api    | `5175` | Accessed via service binding from web   |
+| Workspace | Dev server                                                            | Port   | Notes                                                                                                                          |
+| --------- | --------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| app       | Vite (`vite serve`)                                                   | `5173` | Main entry point. Proxies `/api/*` to `API_ORIGIN` (`http://localhost:8787`)                                                   |
+| web       | Astro (`astro dev`)                                                   | `4321` | Marketing pages only                                                                                                           |
+| api       | Bun (`bun run --watch ./dev.ts`) with Wrangler's `getPlatformProxy()` | `8787` | Same Hono app as `worker.ts`; Hyperdrive bindings use the `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_*` values from `.env` |
 
-In development, Wrangler simulates service bindings locally – requests between workers happen in-process rather than over the network. The `dev` environment in each `wrangler.jsonc` provides development-specific variables (`APP_ORIGIN: http://localhost:5173`, etc.).
+Prerequisites for the api dev server:
 
-::: tip
-Email templates must be built before starting the API dev server. The `bun dev` script handles this automatically by running `bun email:build` first.
-:::
+- `.env.local` must exist (it can be empty or a copy of `.env`), because the `dev` script passes `--env-file ../../.env.local`. Put real secrets there; it is gitignored.
+- The default `DATABASE_URL` and Hyperdrive local connection strings point at `postgres://postgres:postgres@localhost:5432/example`. Start a local PostgreSQL (or point them at a Neon dev branch) and run `bun db:push`, otherwise auth requests fail with `ECONNREFUSED`.
+- The default `RESEND_API_KEY` is a placeholder, so OTP emails are not delivered. The API logs the code in development.
+
+The api `predev` script builds `apps/email` first, so templates are ready when the API starts. The `dev` environment in each `wrangler.jsonc` provides development-specific variables (`APP_ORIGIN: http://localhost:5173`, etc.).
+
+To exercise the web worker's routing and service bindings, deploy to the `preview` environment (`wrangler deploy --env preview` per worker).
