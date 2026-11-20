@@ -49,14 +49,20 @@ React Starter Kit is proudly supported by these amazing sponsors:
 ├── packages/
 │   ├── ui/           shadcn/ui components (new-york style)
 │   ├── core/         Shared types and utilities
-│   └── ws-protocol/  WebSocket protocol with type-safe messaging
+│   ├── pricing-engine/ Checkout pricing: catalog, regional tax, volume discounts, receipts
+│   ├── ws-protocol/  WebSocket protocol with type-safe messaging
+│   └── typescript-config/ Shared tsconfig presets
 ├── db/               Drizzle ORM schemas, migrations, and seed data
 ├── infra/            Terraform (Cloudflare Workers, DNS, Hyperdrive)
 ├── docs/             VitePress documentation
 └── scripts/          Build automation and dev tools
 ```
 
-Each app deploys independently to Cloudflare Workers. The web worker routes `/api/*` to the API worker and app routes to the app worker via service bindings.
+Each app deploys independently to Cloudflare Workers. The web worker routes `/api/*` to the API worker and app routes to the app worker via service bindings. Shared packages are build-time imports; `packages/pricing-engine` and `packages/ws-protocol` are not imported by any app yet.
+
+[![System architecture](docs/architecture/diagrams/architecture.png)](docs/architecture/index.md)
+
+See [Architecture Overview](docs/architecture/index.md) and [Edge](docs/architecture/edge.md) for details. The diagram source is [`docs/architecture/diagrams/architecture.dot`](docs/architecture/diagrams/architecture.dot) (Graphviz); regenerate the PNG and SVG with `docs/architecture/diagrams/render.sh`.
 
 ## Prerequisites
 
