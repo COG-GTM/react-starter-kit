@@ -160,12 +160,12 @@ See [ADR-001](/adr/001-auth-hint-cookie) for the full decision record and [Sessi
 
 ## Environments
 
-| Environment | Workers                                                                      | Domain                | Database       | Deploy command                  |
-| ----------- | ---------------------------------------------------------------------------- | --------------------- | -------------- | ------------------------------- |
-| Development | Local dev servers (see [Edge > Local Development](./edge#local-development)) | `localhost:5173`      | Dev branch     | `bun dev`                       |
-| Preview     | `*-preview`                                                                  | `preview.example.com` | Preview branch | `wrangler deploy --env preview` |
-| Staging     | `*-staging`                                                                  | `staging.example.com` | Staging branch | `wrangler deploy --env staging` |
-| Production  | `*` (no suffix)                                                              | `example.com`         | Main branch    | `wrangler deploy`               |
+| Environment | Workers                                                                      | Domain                | Database                                                                                      | Deploy command                  |
+| ----------- | ---------------------------------------------------------------------------- | --------------------- | --------------------------------------------------------------------------------------------- | ------------------------------- |
+| Development | Local dev servers (see [Edge > Local Development](./edge#local-development)) | `localhost:5173`      | `DATABASE_URL` in `.env` / `.env.local` (defaults to local Postgres `localhost:5432/example`) | `bun dev`                       |
+| Preview     | `*-preview`                                                                  | `preview.example.com` | Preview branch                                                                                | `wrangler deploy --env preview` |
+| Staging     | `*-staging`                                                                  | `staging.example.com` | Staging branch                                                                                | `wrangler deploy --env staging` |
+| Production  | `*` (no suffix)                                                              | `example.com`         | Main branch                                                                                   | `wrangler deploy`               |
 
 Each environment has its own Hyperdrive bindings, service binding targets, and `APP_ORIGIN` / `ALLOWED_ORIGINS` variables. See [Edge > Service Bindings](./edge#service-bindings) for the full wrangler config.
 

@@ -201,6 +201,12 @@ The `worker_suffix` local resolves to `""` for production and `"-${var.environme
 | web       | Astro (`astro dev`)                                                   | `4321` | Marketing pages only                                                                                                           |
 | api       | Bun (`bun run --watch ./dev.ts`) with Wrangler's `getPlatformProxy()` | `8787` | Same Hono app as `worker.ts`; Hyperdrive bindings use the `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_*` values from `.env` |
 
+Prerequisites for the api dev server:
+
+- `.env.local` must exist (it can be empty or a copy of `.env`), because the `dev` script passes `--env-file ../../.env.local`. Put real secrets there; it is gitignored.
+- The default `DATABASE_URL` and Hyperdrive local connection strings point at `postgres://postgres:postgres@localhost:5432/example`. Start a local PostgreSQL (or point them at a Neon dev branch) and run `bun db:push`, otherwise auth requests fail with `ECONNREFUSED`.
+- The default `RESEND_API_KEY` is a placeholder, so OTP emails are not delivered. The API logs the code in development.
+
 The api `predev` script builds `apps/email` first, so templates are ready when the API starts. The `dev` environment in each `wrangler.jsonc` provides development-specific variables (`APP_ORIGIN: http://localhost:5173`, etc.).
 
 To exercise the web worker's routing and service bindings, deploy to the `preview` environment (`wrangler deploy --env preview` per worker).
